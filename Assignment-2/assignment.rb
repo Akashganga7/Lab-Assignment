@@ -44,15 +44,17 @@ class Solution
 
   def clear_collection
     #place solution here
-    
+    @coll.delete_many({});
   end
 
   def load_collection(file_path) 
     #place solution here
+    @coll.insert_many(self.class.load_hash(file_path));
   end
 
   def insert(race_result)
     #place solution here
+    @coll.insert_one(race_result);
   end
 
   #
@@ -61,10 +63,12 @@ class Solution
 
   def all(prototype={})
     #place solution here
+    @coll.find(prototype);
   end
 
   def find_by_name(fname, lname)
     #place solution here
+    @coll.find(first_name: fname, last_name: lname).projection(first_name: 1, last_name: 1, number: 1, _id: 0);
   end
 
   #
@@ -73,6 +77,7 @@ class Solution
 
   def find_group_results(group, offset, limit) 
     #place solution here
+    @coll.find(group: group).projection(group: 0, _id: 0).sort(secs: 1).skip(offset).limit(limit);
   end
 
   #
@@ -81,10 +86,12 @@ class Solution
 
   def find_between(min, max) 
     #place solution here
+    @coll.find(secs: {:$gte => min}, secs: {:$lte => max});
   end
 
   def find_by_letter(letter, offset, limit) 
     #place solution here
+    @coll.find(last_name: {:$regex => '^'+letter.upcase+'.+'}).sort(last_name: 1).skip(offset).limit(limit);
   end
 
   #
@@ -93,10 +100,12 @@ class Solution
   
   def update_racer(racer)
     #place solution here
+    @coll.find(_id: racer[:_id]).replace_one(racer);
   end
 
   def add_time(number, secs)
     #place solution here
+    @coll.find(number: number).update_one(:$inc => {:secs => secs});
   end
 
 end
